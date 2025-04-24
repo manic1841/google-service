@@ -56,3 +56,53 @@ class MediaItemBaseModel(BaseModel):
 
 class MediaItemModel(MediaItemBaseModel, metaclass=AllOptional):
     pass
+
+# Directions API
+class GeocodedWaypointBaseModel(BaseModel):
+    geocoder_status: str
+    place_id: str
+    types: t.List[str]
+
+class GeocodedWaypointModel(GeocodedWaypointBaseModel, metaclass=AllOptional):
+    pass
+
+class PolylineBaseModel(BaseModel):
+    points: str
+
+class PolylineModel(PolylineBaseModel, metaclass=AllOptional):
+    pass
+
+class LegBaseModel(BaseModel):
+    distance: dict
+    duration: dict
+    end_address: str
+    end_location: dict
+    start_address: str
+    start_location: dict
+    steps: t.List[dict]
+    traffic_speed_entry: list
+    via_waypoint: list
+
+class LegModel(LegBaseModel, metaclass=AllOptional):
+    pass
+
+class RoutesBaseModel(BaseModel):
+    bounds: dict
+    copyrights: str
+    legs: t.List[LegModel]
+    overview_polyline: PolylineModel
+    summary: str
+    warnings: list
+    waypoint_order: t.List[int]
+
+class RoutesModel(RoutesBaseModel, metaclass=AllOptional):
+    pass
+
+class DirectionsBaseModel(BaseModel):
+    geocoded_waypoints: t.List[GeocodedWaypointModel]
+    routes: t.List[RoutesModel]
+    status: str
+
+class DirectionsModel(DirectionsBaseModel, metaclass=AllOptional):
+    pass
+

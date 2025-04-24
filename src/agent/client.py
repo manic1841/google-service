@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os.path
+import os
 import requests
 import typing as t
 
@@ -9,11 +9,31 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from google.auth.exceptions import RefreshError
 
-SECRET_PATH = ".credentials/client_secret.json"
-CREDS_PATH = ".credentials/cred.json"
+SRC_FOLDER = os.path.abspath(os.path.join(__file__, "../../.."))
+
+SECRET_PATH = os.path.join(SRC_FOLDER, ".credentials/client_secret.json")
+CREDS_PATH = os.path.join(SRC_FOLDER, ".credentials/cred.json")
 
 
-class GoogleAPIClient:
+class HttpClient:
+    def _raise_error(self, response: requests.Response, title):
+        try:
+            body = response.json()
+        except requests.exceptions.JSONDecodeError:
+            body = {"code": response.status_code, "message": response.text}
+        error = body.get("error")
+        if error:
+            code = error["code"]
+            message = error["message"]
+        else:
+            code = response.status_code
+            message = body
+
+        format_str = f"{title}, code: {code}, message: {message}"
+        raise RuntimeError(format_str)
+
+
+class GoogleAPIClient(HttpClient):
     def __init__(self, scopes: list) -> None:
         self.creds = None
         try:
@@ -48,19 +68,3 @@ class GoogleAPIClient:
             with open(CREDS_PATH, "w") as token:
                 token.write(creds.to_json())
         return creds
-
-    def _raise_error(self, response: requests.Response, title):
-        try:
-            body = response.json()
-        except requests.exceptions.JSONDecodeError:
-            body = {"code": response.status_code, "message": response.text}
-        error = body.get("error")
-        if error:
-            code = error["code"]
-            message = error["message"]
-        else:
-            code = response.status_code
-            message = body
-
-        format_str = f"{title}, code: {code}, message: {message}"
-        raise RuntimeError(format_str)
