@@ -161,3 +161,9 @@ cython_debug/
 
 # Credential
 .credentials
+.git-credentials
+
+# Scripts Sample
+scripts/streetview_images*/
+scripts/output/
+scripts/*.mp4
